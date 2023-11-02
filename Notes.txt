@@ -1,0 +1,98 @@
+Assignment and Game description notes
+
+---
+
+Speed
+Needs to run fast: 1000 games against beginner AIs in a few seconds
+
+Implementation
+Interesting algorithm
+Adaptive AI might get better grade
+Good python code
+No printed outputs!
+Use standard python libraries - discuss if more is needed
+
+No need to write winning code
+1 AI for the competition
+Can submit more for grading - Explain why the one was chosen to compete
+
+Submit AI in canvas
+Deadline friday before last lecture - 1st of December
+
+Short report 1-2 pages in PDF, WORD
+explain tactical approach
+different approaches cosidered
+testing methods
+tools
+literature
+
+---
+
+No Thanks! The game
+
+2-5 players (5 in the tournament)
+33 cards, number 3 to 35
+9 random cards removed from the deck
+11 coins per player
+
+random player starts
+current player opens card from deck if teher are no open cards
+
+current player makes a decision:
+-take card and all coins on card (initially 0 coins are on the card), open new card, next players turn
+-put one coin on the card, next players turn
+
+Upon the pile emptyes penalties computed
+Each card has penalty equivalent to its number
+Exception: subesquent card pair
+Substract number of coins of the player at the end of game from their total penalty
+Lowest total penalty wins
+
+---
+
+Run a competition
+
+Start Take5.py from cmd by:
+python –u NoThanks.py 10000 aifile1 aifile2 ...
+Default: 1000 games, NoThanksBeginners.py AIs
+Returns average score of AIs
+
+Running from editor: see AssignmentNoThanks.pdf
+
+---
+
+Code AI
+
+description in MyAI.py
+Examples in Take5Beginners.py
+Allowed to use as starting points
+
+Can keep track of variables between games
+AI only created once for the competition
+- initialize attributes to use in __init__ method
+startGame method to keep information within a game
+
+---
+
+Useful objects and methods
+
+Card object, attributes: number, penalty, coin - number == penalty
+coin only has meaning for the card given in take method
+
+Player object, method penalty() - current penalty of a player
+penaltyWhenTake() - calculates total penalty when a player takes that card
+can calculate change in penalty by these two methods
+If other methods needed he can add them
+
+---
+
+Testing
+
+1. try it agains NoThanksBeginners.pz AIs - should beat them all
+Can test against other students
+
+Can print objects during test, like State object
+some have suitable __str__ methods encoded
+
+
+
