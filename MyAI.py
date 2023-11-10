@@ -1,4 +1,4 @@
-from Take5Player import Player
+from Take5 import Player
 
 # create a new class inheriting features from Player - defined in NoThanksPlayer.py
 class MyAI(Player):
@@ -25,4 +25,11 @@ class MyAI(Player):
 # False - put a coin, next player
 # if no coins for player, take is not called - automatically takes cards and coins
 
-def take( self, card, state ):
+    def take( self, card, state ):
+        if self.coins <= 0:
+            return True
+        # take randomly with probability 1/2
+        if randint( 0, 2 ) == 1:
+            return True
+        return False
+    
