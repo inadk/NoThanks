@@ -120,6 +120,9 @@ class MyAI(Player):
             if coinRank(self, state) <= 1:
                 return False
 
+
+        
+        
         # coins worth more than penalty (3x) when I have only a few coins
         if self.coins <= 4 and state.round <= 16:
             if card.coins >= ( self.penaltyWhenTake( card ) / ( pow( 2, (5 - self.coins ) ) ) ):
@@ -129,7 +132,8 @@ class MyAI(Player):
         if card.coins >= ( self.penaltyWhenTake( card ) / 1.2 ):
             return True
         return False
-    
+
+        
 
 
     
@@ -161,3 +165,65 @@ def coinRank(self, state):
         if i.coins >= self.coins:
             cr += 1
     return cr
+
+def theirCollection( self, state):
+    tc = []
+    for i in state.players:
+        if i.name != self.name:
+            for j in i.collection:
+                tc.append(j.number)
+    tc = tc.sort()
+    return tc
+
+def isCardTheir( self, state, n):
+    for i in theirCollection( self, state):
+        if i == n:
+            return True
+    return False
+
+def isCardMine(self, n):
+    for i in self.collection:
+        if i.number == n:
+            return True
+    return False
+
+def generalProb(state):
+    return (24 - state.round) / (33 - state.round)
+
+def xCoinsOnCard(ratio, n):
+    return n / ratio 
+
+def connectability(self, state, n):
+    if isCardTheir(self, state, n - 1) and isCardTheir(self, state, n + 1):
+        return 0
+    if isCardTheir(self, state, n - 1):
+        if isCardTheir((self, state, n + 2)):
+            return -0.5
+        return -1
+    if isCardTheir(self, state, n + 1):
+        if isCardTheir((self, state, n - 2)):
+            return 0.5
+        return 1
+    if isCardTheir((self, state, n + 2)) and isCardTheir((self, state, n - 2)):
+        return 1
+    if isCardTheir((self, state, n + 2)):
+        return 1.5
+    if isCardTheir((self, state, n - 2)):
+        return 1.5
+    
+def xPenalt(self, card, state, n):
+    connectability(self, state, n) 
+
+
+
+    return 2
+
+def upper2ndNeighbour(self, n):
+    if isCardMine(self, n - 2):
+        return True
+    return False
+
+def lower2ndNeighbour(self, n):
+    if isCardMine(self, n + 2):
+        return True
+    return False
