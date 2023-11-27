@@ -96,49 +96,52 @@ class MyAI(Player):
 # if no coins for player, take is not called - automatically takes cards and coins
 
     def take( self, card, state ):
-        if self.coins <= 0:
+        
+        # output of 2 for clear optimal takes
+        # output of 1000 for clear optimal no takes
+        def decide( self, card, state):
+            
+            score = 0
+
+            if self.coins <= 0:
+                return -10000
+
+            # if card is not in my collection and not in any of my neighbours collection, get coins on it before taking (whenever possible)
+            if myNeighbour(self, card):
+                if someonesNeighbour(self, card, state):
+                    return -10000
+                if coinlessPlayer(self, state):
+                    return -10000
+                if card.number / (card.coins + 4) < 2.5: # optimize parameters later!
+                    return -10000
+                return 10000 # dont take!
+
+            # optimal play at last rounds
+            # only take penaltiless card at round 24-n (n=1,2,3), except when there are less than (n+1) players with less coins than me
+            if state.round == 23:
+                if coinRank(self, state) <= 3:
+                    return 10000
+            if state.round == 22:
+                if coinRank(self, state) <= 2:
+                    return 10000    
+            if state.round == 21:
+                if coinRank(self, state) <= 1:
+                    return 10000
+            
+            # adapt scoring for state and self variable values
+            # score -= card.coins * 2 # value of coins for not taking penalty in the future
+            score += card.penalty - card.coins # penalty I take
+            score -= ( 20 / self.coins ) * card.coins * pow( (24 - state.round), 2) / 1000
+
+            return score
+        
+
+        if decide( self, card, state) < 0:
             return True
+        else:
+            return False
 
-        # if card is not my collection and not in any of my neighbours collection, get coins on it before taking (whenever possible)
-        if myNeighbour(self, card):
-            if someonesNeighbour(self, card, state):
-                return True
-            if coinlessPlayer(self, state):
-                return True
-            if card.number / (card.coins + 4) < 2.5:
-                return True
-            return False           
-
-        # only take penaltiless card at round 24-n (n=1,2,3), except when there are less than (n+1) players with less coins than me
-        if state.round == 23:
-            if coinRank(self, state) <= 3:
-                return False
-        if state.round == 22:
-            if coinRank(self, state) <= 2:
-                return False        
-        if state.round == 21:
-            if coinRank(self, state) <= 1:
-                return False
-
-
-        
-        
-        # coins worth more than penalty (3x) when I have only a few coins
-        if self.coins <= 4 and state.round <= 16:
-            if card.coins >= ( self.penaltyWhenTake( card ) / ( pow( 2, (5 - self.coins ) ) ) ):
-                return True    
-
-        # take only if it results in collecting penalty and coins in at least 4/3 ratio
-        if card.coins >= ( self.penaltyWhenTake( card ) / 1.2 ):
-            return True
-        return False
-
-        
-
-
-    
-
-    
+      
 def someonesNeighbour( self, card, state):
     for i in state.players:
         if i.name != self.name:
@@ -165,6 +168,10 @@ def coinRank(self, state):
         if i.coins >= self.coins:
             cr += 1
     return cr
+
+
+
+'''
 
 def theirCollection( self, state):
     tc = []
@@ -227,3 +234,5 @@ def lower2ndNeighbour(self, n):
     if isCardMine(self, n + 2):
         return True
     return False
+
+'''
