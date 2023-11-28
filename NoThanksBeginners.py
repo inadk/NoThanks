@@ -238,7 +238,19 @@ def isCardTheir( self, state, n):
 def closestNeighbour(self, state, card):
     tc = theirCollection(self, state).append(card.number).sort()
     ind = tc.index(card.number)
-    return [ tc[ ind ] - tc[ ind - 1 ], tc[ ind + 1 ] - tc[ ind ], tc[ ind - 1], tc[ ind + 1] ]
+    if ind == 0: 
+        lowerNeighDistance = 0
+        lowerNeigh = 0
+        tc[ ind - 1]
+    if ind == len(tc) - 1:
+        upperNeighDistance = 0
+        lowerNeigh = 0
+    else:
+        lowerNeighDistance = tc[ ind ] - tc[ ind - 1 ]
+        lowerNeigh = tc[ ind - 1]
+        upperNeighDistance = tc[ ind + 1 ] - tc[ ind ]
+        upperNeigh = tc[ ind + 1]
+    return [ lowerNeighDistance, upperNeighDistance, lowerNeigh, upperNeigh ]
 
 def closestNeighbourStatus( self, state, card):
     status = [0, 0]
