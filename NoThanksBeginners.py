@@ -2,6 +2,7 @@ from NoThanksPlayer import Player
 from NoThanksState import State, PlayerState
 from random import randint
 
+'''
 class RandomPlayer(Player):
     def __init__( self ):
         Player.__init__( self )
@@ -13,6 +14,7 @@ class RandomPlayer(Player):
         if randint( 0, 3 ) == 1:
             return True
         return False
+'''
 
 class LowerPenalty(Player):
     def __init__( self ):
@@ -129,14 +131,14 @@ class MyAI(Player):
                     return 10000
             
             # adapt scoring for state and self variable values
-            # score -= card.coins * 2 # value of coins for not taking penalty in the future
-            score += card.penalty - card.coins # penalty I take
+            # penalty I take + expected penalty reduction
+            score += card.penalty - card.coins # - xCoinsFromNeighbours(card, state) 
             score -= ( 20 / self.coins ) * card.coins * pow( (24 - state.round), 2) / 1000
 
             return score
         
 
-        if decide( self, card, state) < 0:
+        if decide( self, card, state) < -0:
             return True
         else:
             return False
@@ -169,9 +171,46 @@ def coinRank(self, state):
             cr += 1
     return cr
 
+"""
+# not a probabilty measure, rather something that relates to probabilities
+def getNeighbourProb(self, card, state):
 
+    probCardGetsPlayed = ( 33 - state.round ) / 33
+   
+    if card.number == 35:
+        if isCardTheir( self, state, 34):
+            return 0       
+        if isCardTheir( self, state, 33):
+            return 0
+        if isCardTheir( self, state, 32):
+            return probCardGetsPlayed / 2
+        else:
+            return probCardGetsPlayed
+        
+    if card.number == 34:
+        if isCardTheir( self, state, 35) ^ isCardTheir( self, state, 33):
+            return 0
+        if isCardTheir( self, state, 35)
+        else:
+            return probCardGetsPlayed
+        
+    if card.number == 33:
+        if someonesNeighbour(4, state):
+            return 0
+        else:
+            return probCardGetsPlayed
+    
+    if card.number > 5:
+        
+        
+    else:
+        return 0
+    
+def xCoinsFromNeighbours(card, state):
+    return getNeighbourProb(card, state) * card.number / 3.5
 
-'''
+"""
+
 
 def theirCollection( self, state):
     tc = []
@@ -182,11 +221,32 @@ def theirCollection( self, state):
     tc = tc.sort()
     return tc
 
+def allDrawnCards( state ):
+    ac = []
+    for i in state.players:
+        for j in i.collection:
+            tc.append(j.number)
+    ac = ac.sort()
+    return ac
+
 def isCardTheir( self, state, n):
     for i in theirCollection( self, state):
         if i == n:
             return True
     return False
+
+def closestNeighbour(self, state, card):
+    tc = theirCollection(self, state).append(card.number).sort()
+    ind = tc.index(card.number)
+    return [ tc[ ind ] - tc[ ind - 1 ], tc[ ind + 1 ] - tc[ ind ], tc[ ind - 1], tc[ ind + 1] ]
+
+def closestNeighbourStatus( self, state, card):
+    status = [0, 0]
+    if closestNeighbour(self, state, card)[2] in self.collection:
+        status[0] = 1
+    if closestNeighbour(self, state, card)[3] in self.collection:
+        status[1] = 1
+    return status    
 
 def isCardMine(self, n):
     for i in self.collection:
