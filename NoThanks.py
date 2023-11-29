@@ -10,7 +10,7 @@ from NoThanksState import State
 # Need to add:
 # Handy functions for the players.
 
-DEFAULTLENGTH = 10000
+DEFAULTLENGTH = 21
 DEFAULTAIS = ["NoThanksBeginners", "MyAI"]
 
 MAXPLAYERS = 5

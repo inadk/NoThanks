@@ -82,6 +82,11 @@ class MyAI(Player):
         self.setName( 'MyAI' )
         
         self.scores = []
+        self.gamepenalty = []
+        self.lastround = -1
+        self.takeCoinCount = []
+        self.takesPerGame = []
+        
 
 # create at least one method
 # take.take
@@ -101,12 +106,32 @@ class MyAI(Player):
 
     def take( self, card, state ):
         
+        # update game stats
+        if self.scores == []:
+            self.scores.append( self.totalpenalty)
+
+        # 1st call of MyAI in current game
+        if self.lastround > state.round:
+
+            self.scores.append( self.totalpenalty)
+
+            if len(self.scores) == 1:
+                self.gamepenalty.append( self.scores[0] )
+            if len(self.scores) > 1:
+                self.gamepenalty.append( self.scores[-1] - self.scores[-2])
+
+        self.lastround = state.round
+
+        if len(self.scores) == 20:
+            print(self.gamepenalty)
+            print(self.takeCoinCount)
+
         # output of 2 for clear optimal takes
         # output of 1000 for clear optimal no takes
         def decide( self, card, state):
-
+            
             # if state.round == 24: endOfGameStats(self, card, state)
-        
+
             score = 0
            
             if self.coins <= 0:
@@ -147,6 +172,7 @@ class MyAI(Player):
 
         if decide( self, card, state) < -3:
             
+            self.takeCoinCount.append(self.coins)
             return True
         else:
             return False
@@ -200,46 +226,6 @@ def coinRank(self, state):
             cr += 1
     return cr
 
-"""
-# not a probabilty measure, rather something that relates to probabilities
-def getNeighbourProb(self, card, state):
-
-    probCardGetsPlayed = ( 33 - state.round ) / 33
-   
-    if card.number == 35:
-        if isCardTheir( self, state, 34):
-            return 0       
-        if isCardTheir( self, state, 33):
-            return 0
-        if isCardTheir( self, state, 32):
-            return probCardGetsPlayed / 2
-        else:
-            return probCardGetsPlayed
-        
-    if card.number == 34:
-        if isCardTheir( self, state, 35) ^ isCardTheir( self, state, 33):
-            return 0
-        if isCardTheir( self, state, 35)
-        else:
-            return probCardGetsPlayed
-        
-    if card.number == 33:
-        if someonesNeighbour(4, state):
-            return 0
-        else:
-            return probCardGetsPlayed
-    
-    if card.number > 5:
-        
-        
-    else:
-        return 0
-    
-def xCoinsFromNeighbours(card, state):
-    return getNeighbourProb(card, state) * card.number / 3.5
-
-"""
-
 def theirCollection( self, state):
     tc = []
     for i in state.players:
@@ -262,27 +248,6 @@ def isCardTheir( self, state, n):
         if i == n:
             return True
     return False
-
-"""
-def closestNeighbour(self, state, card):
-    tc = theirCollection(self, state)
-    tc.append(card.number)
-    tc.sort()
-    ind = tc.index(card.number)
-    if ind == 0: 
-        lowerNeighDistance = 0
-        lowerNeigh = 0
-        tc[ ind - 1]
-    if ind == len(tc) - 1:
-        upperNeighDistance = 0
-        upperNeigh = 0
-    else:
-        lowerNeighDistance = tc[ ind ] - tc[ ind - 1 ]
-        lowerNeigh = tc[ ind - 1]
-        upperNeighDistance = tc[ ind + 1 ] - tc[ ind ]
-        upperNeigh = tc[ ind + 1]
-    return [ lowerNeighDistance, upperNeighDistance, lowerNeigh, upperNeigh ]
-"""
 
 def closestNeighbour(self, state, card):
     tc = theirCollection(self, state)
@@ -361,50 +326,3 @@ def pUpperNeighbour(self, state, card):
     
 def xNeighbour(self, state, card, r):
     return ( pLowerNeighbour(self, state, card) + pUpperNeighbour(self, state, card) ) * card.number / r
-
-"""
-def isCardMine(self, n):
-    for i in self.collection:
-        if i.number == n:
-            return True
-    return False
-
-def generalProb(state):
-    return (24 - state.round) / (33 - state.round)
-
-def xCoinsOnCard(ratio, n):
-    return n / ratio 
-
-def connectability(self, state, n):
-    if isCardTheir(self, state, n - 1) and isCardTheir(self, state, n + 1):
-        return 0
-    if isCardTheir(self, state, n - 1):
-        if isCardTheir((self, state, n + 2)):
-            return -0.5
-        return -1
-    if isCardTheir(self, state, n + 1):
-        if isCardTheir((self, state, n - 2)):
-            return 0.5
-        return 1
-    if isCardTheir((self, state, n + 2)) and isCardTheir((self, state, n - 2)):
-        return 1
-    if isCardTheir((self, state, n + 2)):
-        return 1.5
-    if isCardTheir((self, state, n - 2)):
-        return 1.5
-    
-def xPenalt(self, card, state, n):
-    connectability(self, state, n) 
-    return 2
-
-def upper2ndNeighbour(self, n):
-    if isCardMine(self, n - 2):
-        return True
-    return False
-
-def lower2ndNeighbour(self, n):
-    if isCardMine(self, n + 2):
-        return True
-    return False
-
-"""
