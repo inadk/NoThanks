@@ -85,3 +85,46 @@ class AvoidPenalty(LowPenalty):
 		if cardselect < 0:
 			return hand[random.randrange(0,len( hand ))]
 		return hand[cardselect]
+
+
+class MyAI(Player):
+	def __init__( self ):
+		Player.__init__( self )
+		self.setName( 'MyAI' )
+		
+		self.cardsInPlay = [i for i in range(1, 105)]
+		print(self.cardsInPlay)
+	def playCard( self, hand, rows, state):
+		
+		if state.round > 1:
+			for i in state.players:
+				print( (i.lastcard).number )
+				if ( (i.lastcard).number in self.cardsInPlay):
+					self.cardsInPlay.remove( (i.lastcard).number )
+				else:
+					print('card played has been played before: ' + str((i.lastcard).number))
+		if state.round == 10: 
+			print(self.cardsInPlay)
+
+		cardselect = -1
+		rowselect = -1
+		i = 0
+		# Try to find a card that goes into a row without giving a penalty
+		while i < len(hand):
+			rowselect = hand[i].goesToRow( rows )
+			if rowselect >= 0:
+				cardselect = i
+				break
+			i += 1
+		# Now try to find a card that goes in a row as short as possible
+		for i in range( cardselect+1, len(hand) ):
+			newrow = hand[i].goesToRow( rows )
+			if newrow < 0:
+				continue
+			if rows[newrow].size() < rows[rowselect].size():
+				rowselect = newrow
+				cardselect = i
+		# If all cards seem to give a penalty, play a random one
+		if cardselect < 0:
+			return hand[random.randrange(0,len( hand ))]
+		return hand[cardselect]
