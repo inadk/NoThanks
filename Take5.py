@@ -10,7 +10,7 @@ from Take5State import State
 # Need to add:
 # Handy functions for the players.
 
-DEFAULTLENGTH = 1
+DEFAULTLENGTH = 10000
 DEFAULTAIS = ["Take5Beginners"]
 
 MAXPLAYERS = 10
