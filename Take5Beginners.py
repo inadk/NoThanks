@@ -23,14 +23,19 @@ class LowPenalty(RandomPlayer):
 			if rows[i].penalty() < rows[rowselect].penalty():
 				rowselect = i
 		return rowselect
-
+        
 class LowToHigh(LowPenalty):
 	def __init__( self ):
 		Player.__init__( self )
 		self.setName( 'LowToHigh' )
 	def playCard( self, hand, rows, state ):
 		return hand[0]
-
+	def chooseRow( self, rows, state ):
+		rowselect = 0
+		for i in range(1,len(rows)):
+			if rows[i].penalty() < rows[rowselect].penalty():
+				rowselect = i
+		return rowselect
 
 class HighToLow(LowPenalty):
 	def __init__( self ):
@@ -38,7 +43,12 @@ class HighToLow(LowPenalty):
 		self.setName( 'HighToLow' )
 	def playCard( self, hand, rows, state ):
 		return hand[-1]
-
+	def chooseRow( self, rows, state ):
+		rowselect = 0
+		for i in range(1,len(rows)):
+			if rows[i].penalty() < rows[rowselect].penalty():
+				rowselect = i
+		return rowselect
 
 class LowToHighPenalty1(LowPenalty):
 	def __init__( self ):
@@ -50,7 +60,12 @@ class LowToHighPenalty1(LowPenalty):
 			if hand[i].penalty < hand[cardselect].penalty:
 				cardselect = i
 		return hand[cardselect]
-
+	def chooseRow( self, rows, state ):
+		rowselect = 0
+		for i in range(1,len(rows)):
+			if rows[i].penalty() < rows[rowselect].penalty():
+				rowselect = i
+		return rowselect
 	
 class LowToHighPenalty2(LowPenalty):
 	def __init__( self ):
@@ -62,7 +77,12 @@ class LowToHighPenalty2(LowPenalty):
 			if hand[i].penalty < hand[cardselect].penalty:
 				cardselect = i
 		return hand[cardselect]
-
+	def chooseRow( self, rows, state ):
+		rowselect = 0
+		for i in range(1,len(rows)):
+			if rows[i].penalty() < rows[rowselect].penalty():
+				rowselect = i
+		return rowselect
 
 class HighToLowPenalty1(LowPenalty):
 	def __init__( self ):
@@ -74,7 +94,13 @@ class HighToLowPenalty1(LowPenalty):
 			if hand[i].penalty > hand[cardselect].penalty:
 				cardselect = i
 		return hand[cardselect]
-
+	def chooseRow( self, rows, state ):
+		rowselect = 0
+		for i in range(1,len(rows)):
+			if rows[i].penalty() < rows[rowselect].penalty():
+				rowselect = i
+		return rowselect
+        
 	
 class HighToLowPenalty2(LowPenalty):
 	def __init__( self ):
@@ -86,7 +112,12 @@ class HighToLowPenalty2(LowPenalty):
 			if hand[i].penalty > hand[cardselect].penalty:
 				cardselect = i
 		return hand[cardselect]
-
+	def chooseRow( self, rows, state ):
+		rowselect = 0
+		for i in range(1,len(rows)):
+			if rows[i].penalty() < rows[rowselect].penalty():
+				rowselect = i
+		return rowselect
 	
 class AvoidPenalty(LowPenalty):
 	def __init__( self ):
@@ -115,35 +146,73 @@ class AvoidPenalty(LowPenalty):
 		if cardselect < 0:
 			return hand[random.randrange(0,len( hand ))]
 		return hand[cardselect]
-
+	def chooseRow( self, rows, state ):
+		rowselect = 0
+		for i in range(1,len(rows)):
+			if rows[i].penalty() < rows[rowselect].penalty():
+				rowselect = i
+		return rowselect
+        
 
 # ---------------------------------------------------------------------------------------
 
-class MyAI(Player):
+class TakeMeHome(Player):
 	def __init__( self ):
 		Player.__init__( self )
-		self.setName( 'MyAI' )
-		self.outcomeCounter = [0, 0, 0]
-		self.penalties = [0]
-		self.strategies = [0]
-
+		self.setName( 'TakeMeHome' )
+		self.outcomeCounter = [0, 0, 0, 0, 0, 0, 0]
+		self.gamepenalties = [0]
+		self.strategies = []
 
 	def startGame(self):
 		self.cardsInPlay = [i for i in range(1, 105)]
+		
 
 	def endGame(self, state):
-		self.penalties.append(0)
+		self.gamepenalties.append(self.penalty())
+		self.gamepenalties.append(0)
 		self.strategies.append(0)
+
+
 		if self.games == 10000:
-			print( self.outcomeCounter)
-			print('pick highest score card avg penalty: '  + str( sum(element for flag, element in zip(self.strategies, self.penalties) if flag == 1) / self.strategies.count(1) ) )
-			print('pick lowest score card avg penalty: '  + str( sum(element for flag, element in zip(self.strategies, self.penalties) if flag == 2) / self.strategies.count(2) ) )
-			print('number of time strategies were applied: ' + str( len(self.strategies)) )
-			print('strategy occurences: ' + str( self.strategies.count(1) ) + '; ' + str( self.strategies.count(2) ))
+
+			self.penalties = [max(self.gamepenalties[i+1] - self.gamepenalties[i], 0) for i in range(len(self.gamepenalties) - 1)]
+
+
+			print(" ")
+			print('Strategies: P1, 6lowest, lowScore, highScore, lowestPenaltyRow, highest')
+			print('Avg penalty:  ' 
+		 + "{:.2f}".format( sum(element for flag, element in zip(self.strategies, self.penalties) if flag == 1) / self.strategies.count(1) ) + ', ' 
+		 + "{:.2f}".format( sum(element for flag, element in zip(self.strategies, self.penalties) if flag == 2) / self.strategies.count(2) ) + ', '
+		 + "{:.2f}".format( sum(element for flag, element in zip(self.strategies, self.penalties) if flag == 3) / self.strategies.count(3) ) + ', ' 
+		 + "{:.2f}".format( sum(element for flag, element in zip(self.strategies, self.penalties) if flag == 4) / self.strategies.count(4) ) + ', '  
+		 + "{:.2f}".format( sum(element for flag, element in zip(self.strategies, self.penalties) if flag == 5) / self.strategies.count(5) ) + ', '  
+		 + "{:.2f}".format( sum(element for flag, element in zip(self.strategies, self.penalties) if flag == 6) / self.strategies.count(6) ) )
+			print('Occurences: ' 
+		 + "{:.2%}".format( self.strategies.count(1) / ( len(self.strategies) - self.strategies.count(0) ) ) + ', ' 
+		 + "{:.2%}".format( self.strategies.count(2) / ( len(self.strategies) - self.strategies.count(0) )  ) + ', '
+		 + "{:.2%}".format( self.strategies.count(3) / ( len(self.strategies) - self.strategies.count(0) )  ) + ', '
+		 + "{:.2%}".format( self.strategies.count(4) / ( len(self.strategies) - self.strategies.count(0) )  ) + ', ' 
+		 + "{:.2%}".format( self.strategies.count(5) / ( len(self.strategies) - self.strategies.count(0) )  ) + ', ' 
+		 + "{:.2%}".format( self.strategies.count(6) / ( len(self.strategies) - self.strategies.count(0) )  ) )
+			#print('Total occurences: ' + str( len(self.strategies) - self.strategies.count(0) ) )
+			#print(sum(self.penalties))
+			#print(len(self.gamepenalties))
+
+
+			#print(self.strategies)
+			#print(self.penalties)
+			
 
 	def playCard( self, hand, rows, state):
 
 		# list available cards
+
+		if state.round != 1: 
+			self.gamepenalties.append(self.penalty())
+
+		#print(state.round)
+		#print(self.penalties)
 		
 		if state.round == 1:
 			for i in range(4):
@@ -205,22 +274,22 @@ class MyAI(Player):
 			else:
 				return None
 
-		'''
+		
 		# from P1 fitting cards choose card that fits highest penalty row, choose lowest such card
-		def choosecfP1( self, rows ):
-			cfP1r = cfP1rows(self)
+		def choosecfP1( rows ):
+			cfP1r = cfP1rows( )
 			if any( cfP1r ):
-				rrbp = rowRankByPenalty( rows )
+				rrbp = rowRankByPenalty( rows)
 				for i in range(0, 4):
 					if cfP1r[ rrbp[i] ]:
 						return cfP1r[ rrbp[i] ][0]
+		
 		'''
-
 		# from P1 fitting cards choose lowest card 
 		def choosecfP1():
 			if myLowestcfP1():
 				return myLowestcfP1()
-
+		'''
 
 		def logGameData(self, state, rows, hand):
 			print( 'round: ' + str( state.round ) )
@@ -254,7 +323,9 @@ class MyAI(Player):
 		
 		if cfP1Exists( ):
 			# print('playing cfP1 from hand at index: ' + str( hand[ findCardInHandByNumber( self, choosecfP1( self, rows ) ) ] ) )
-			return hand[ findCardInHandByNumber( self, choosecfP1( ) ) ]
+			self.outcomeCounter[1] += 1
+			self.strategies.append( 1 )			
+			return hand[ findCardInHandByNumber( self, choosecfP1( rows ) ) ]
 
 		# ------------------------------------------------------------------------------------------------------------------------------------------
 		# if no cards fit any row with P=1
@@ -403,8 +474,9 @@ class MyAI(Player):
 					if rowPlaces[ gTWR[i] ] == 0:
 						scores.append(0)
 					else:
-						scores.append( nCBelowMine[i] / rowPlaces[ gTWR[i] ] ) 
+						scores.append( nCBelowMine[i] / rowPlaces[ gTWR[i] ]  ) 
 						# nCBelowMine[i] / sum(rowPlaces) * rowPlaces[ gTWR[i] ] * rowPlaces[ gTWR[i] ]
+						# nCBelowMine[i] - rowPlaces[ gTWR[i] ] * rowPlaces[ gTWR[i] ]
 			return scores
 		
 		scr = scoreCards(self, hand, rows)
@@ -449,22 +521,62 @@ class MyAI(Player):
 		#logGameData(self, state, rows, hand)
 		#logMetrics()
 		#print(scr)
-
-		def penaltiesPerStrategy(self):
-			self.penalties.append( self.penalty() - self.penalties[-1] )
-
-		penaltiesPerStrategy(self)
-
-		if ghighscr[0] > 5:
-			self.outcomeCounter[0] += 1
-			self.strategies.append( 1 )
-			return hand[ ghighscr[1] ]
-		else:			
-			self.outcomeCounter[1] += 1
+		
+		# ------------------------------------------------------------------------------------------------------------------------------------------------------
+		# Minimization of penalty collected by low cards
+		def lowestRowPenalty():
+			rowselect = 0
+			for i in range(1,len(rows)):
+				if rows[i].penalty() < rows[rowselect].penalty():
+					rowselect = i
+			return rows[i].penalty()
+		
+		lowestRP = lowestRowPenalty()
+		
+		if ( self.cardsInPlay.index( self.hand[0].number ) <= 5 and lowestRP <= 2 ):
+			self.outcomeCounter[2] += 1
 			self.strategies.append( 2 )
+			return hand[0]
+		
+		
+		if glowscr[0] < 2:	
+			self.outcomeCounter[3] += 1
+			self.strategies.append( 3 )
 			return hand[ glowscr[1] ]
+		if ghighscr[0] >= 10:
+			self.outcomeCounter[4] += 1
+			self.strategies.append( 4 )
+			return hand[ ghighscr[1] ]
+		
+		def placesInLowestAvgPenaltyRow():
+			rowselect = 0
+			smallestp = 30
+			for i in range(1,len(rows)):
+				if avgRP[i] < smallestp:
+					smallestp = avgRP[i]
+					rowselect = i
+			return [ i, rows[i].size() ]
+		
+		piLPR = placesInLowestAvgPenaltyRow()
+		
+		def cardToLowestPenaltyRow():
+			for i in range(len(gTWR)):
+				if gTWR[i] == piLPR[0]:
+					return i
+			else:
+				return False
+		
+		ctLPR = cardToLowestPenaltyRow()
 
-
+		if ctLPR != False and piLPR[1] < 5:
+			self.outcomeCounter[5] += 1
+			self.strategies.append( 5 )
+			return hand[ ctLPR ]
+		
+		self.outcomeCounter[6] += 1
+		self.strategies.append( 6 )
+		return hand[-1]
+		
 	def chooseRow( self, rows, state ):
 		rowselect = 0
 		for i in range(1,len(rows)):

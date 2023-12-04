@@ -73,13 +73,13 @@ class CoinsDependent(Player):
 
 
 # create a new class inheriting features from Player - defined in NoThanksPlayer.py
-class MyAI(Player):
+class ImFineThanks(Player):
     # create init method 
     def __init__( self ):
         # calls init method from player
         Player.__init__( self )
         # give itself a name with the setName method
-        self.setName( 'MyAI' )
+        self.setName( 'ImFineThanks' )
         
         self.scores = []
         self.gamepenalty = []
@@ -122,9 +122,9 @@ class MyAI(Player):
 
         self.lastround = state.round
 
-        if len(self.scores) == 20:
-            print(self.gamepenalty)
-            print(self.takeCoinCount)
+        #if len(self.scores) == 20:
+        #    print(self.gamepenalty)
+        #    print(self.takeCoinCount)
 
         # output of 2 for clear optimal takes
         # output of 1000 for clear optimal no takes
@@ -137,19 +137,22 @@ class MyAI(Player):
             if self.coins <= 0:
                 return -10000
 
-            # if card is not in my collection and not in any of my neighbours collection, get coins on it before taking (whenever possible)
+            # if card is my neighbour and has no neighbours in any of my opponents collection, get coins on it before taking (whenever possible)
             if myNeighbour(self, card):
                 if someonesNeighbour(self, card, state):
                     return -10000
                 if coinlessPlayer(self, state):
                     return -10000
-                if card.number / (card.coins + 4) < 2.5: # optimize parameters later!
+                if card.number / (card.coins + 4) < 2.5: 
                     return -10000
                 return 10000 # dont take!
 
             # optimal play at last rounds
             # only take penaltiless card at round 24-n (n=1,2,3), except when there are less than (n+1) players with less coins than me
 
+            if state.round == 24:
+                if coinRank(self, state) <= 4:
+                    return 10000
             if state.round == 23:
                 if coinRank(self, state) <= 3:
                     return 10000
@@ -162,7 +165,7 @@ class MyAI(Player):
             
             # adapt scoring for state and self variable values
             # penalty I take + expected penalty reduction
-            score += card.penalty - card.coins - xNeighbour(self, state, card, 3) # - xCoinsFromNeighbours(card, state)
+            score += card.penalty - card.coins - xNeighbour(self, state, card, 3) 
             score -= ( 20 / self.coins ) * card.coins * pow( (24 - state.round), 2) / 1000
             
             # if score < -2: debug(self, card, state, score)
@@ -255,10 +258,9 @@ def closestNeighbour(self, state, card):
     tc.sort()
     ind = tc.index(card.number)
 
-    # Initialize variables
-    lowerNeighDistance = 100  # Use infinity to represent an unreachable neighbor
+    lowerNeighDistance = 100  
     upperNeighDistance = 100
-    lowerNeigh = 0  # None to represent no neighbor
+    lowerNeigh = 0 
     upperNeigh = 0
 
     if ind > 0:
