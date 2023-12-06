@@ -58,7 +58,8 @@ class TakeMeHome(Player):
 
 		if state.round > 1:
 			for i in state.players:
-				self.cardsInPlay.remove( i.lastcard.number )
+				if i.ingame == True:
+					self.cardsInPlay.remove( i.lastcard.number )
 
 		# make decision based on card fits with P=1
 
